@@ -1,7 +1,6 @@
-package com.yww.image;
+package com.yww.image.util;
 
 
-import com.yww.image.util.OpencvUtil;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 

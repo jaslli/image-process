@@ -45,7 +45,7 @@ public class Deskew {
     public static void deskew(String src, String dst) {
         Mat mat = Imgcodecs.imread(src);
         // 计算图片倾斜角
-        double angle = getAngle(mat);
+        double angle = getDeskewAngle(mat);
         // 图片旋转
         ImageUtil.rotateImage(src, dst, angle);
     }
@@ -56,8 +56,8 @@ public class Deskew {
      * @param mat       图片
      * @return          倾斜角度
      */
-    public static double getAngle(Mat mat) {
-        // 图片灰度化
+    public static double getDeskewAngle(Mat mat) {
+        // 图片边缘检测
         Mat canny = ImageUtil.canny(mat, 60, 200, 3);
 
         Mat lines = new Mat();
