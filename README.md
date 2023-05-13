@@ -15,7 +15,7 @@ cover: https://img.yww52.com/2023/4/2023-4-18top_img.jpg
 
 2. 选择windows版本`opencv-4.7.0-windows.exe`，然后进行安装。(linux的版本需要先进行编译后获取动态库和jar包)
 
-3. 在安装目录的`opencv/build/java`的目录下，获得`jar`包和动态库文件。
+3. 在安装目录的`opencv/build/java`的目录下，获得`jar`包和动态库文件。（注意是安装目录里）
 
 4. 在maven项目引入`opencv`依赖。
 
@@ -83,8 +83,8 @@ public class Test {
 
     public static void main(String[] args) {
         OpencvUtil.load();
-        String filePath = "C:/Users/11419/Desktop/project/image-process/src/main/resources/test/1.jpg";
-        String output = "C:/Users/11419/Desktop/project/image-process/src/main/resources/test/2.jpg";
+        String filePath = "C:/Users/yww/Desktop/project/image-process/src/main/resources/test/1.jpg";
+        String output = "C:/Users/yww/Desktop/project/image-process/src/main/resources/test/2.jpg";
 
         Mat mat = Imgcodecs.imread(filePath);
         // 写出图片
