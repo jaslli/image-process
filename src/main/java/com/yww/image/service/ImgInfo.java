@@ -26,10 +26,6 @@ import java.io.IOException;
  */
 public class ImgInfo {
 
-    static {
-        OpencvUtil.load();
-    }
-
     /**
      * 获取图片的分辨率
      *

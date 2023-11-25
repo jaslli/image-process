@@ -17,10 +17,6 @@ import org.opencv.imgcodecs.Imgcodecs;
  */
 public class Brightness {
 
-    static {
-        OpencvUtil.load();
-    }
-
     /**
      * 计算图片平均亮度
      * mean 获取Mat中各个通道的均值
@@ -29,12 +25,10 @@ public class Brightness {
      * @return          图片平均亮度值
      */
     public static double brightness(String filePath) {
-        Mat src = Imgcodecs.imread(filePath);
-        // 灰度化，转为灰度图
-        Mat gray = ImageUtil.gray(src.clone());
-
+        Mat grayImage = Imgcodecs.imread(filePath, Imgcodecs.IMREAD_GRAYSCALE);
         // 计算图像的平均亮度
-        Scalar mean = Core.mean(gray);
+        Scalar mean = Core.mean(grayImage);
+        grayImage.release();
         return mean.val[0];
     }
 

@@ -29,15 +29,6 @@ import java.io.InputStream;
 public class OpencvUtil {
 
     /**
-     * 加载opencv动态库
-     * win: opencv_java470.dll
-     * linux: opencv_java470.so
-     */
-    public static void load() {
-        System.load(ResourceUtil.getResource("lib/opencv_java470.dll").getPath());
-    }
-
-    /**
      * 保存图片到指定位置
      *
      * @param mat       图片矩阵

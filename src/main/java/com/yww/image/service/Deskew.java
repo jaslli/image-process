@@ -6,6 +6,7 @@ import com.yww.image.util.ImageDeskew;
 import com.yww.image.util.ImageUtil;
 import com.yww.image.util.OpencvUtil;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -32,10 +33,6 @@ import java.util.Map;
  */
 public class Deskew {
 
-    static {
-        OpencvUtil.load();
-    }
-
     /**
      * 图片进行纠偏
      *
@@ -53,38 +50,64 @@ public class Deskew {
     /**
      *  通过霍夫变换后，获取直线并计算出整体的倾斜角度
      *
-     * @param mat       图片
+     * @param src       图片
      * @return          倾斜角度
      */
-    public static double getDeskewAngle(Mat mat) {
-        // 图片边缘检测
-        Mat canny = ImageUtil.canny(mat, 60, 200, 3);
+    public static Integer getDeskewAngle(Mat src) {
+        // 图片灰度化
+        Mat gray = src.clone();
+        Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
 
+//        // 高斯模糊（？）
+//        @Cleanup
+//        UMat blur = gray.clone();
+//        GaussianBlur(gray, blur, new Size(9, 9), 0);
+//        // 二值化（？）
+//        @Cleanup
+//        UMat thresh = blur.clone();
+//        threshold(blur, thresh, 0, 255, THRESH_BINARY_INV + THRESH_OTSU);
+
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+
+        // 图片膨胀
+        Mat erode = gray.clone();
+        Imgproc.erode(gray, erode, kernel);
+
+        // 图片腐蚀
+        Mat dilate = erode.clone();
+        Imgproc.dilate(erode, dilate, kernel);
+
+        // 边缘检测
+        Mat canny = dilate.clone();
+        Imgproc.Canny(dilate, canny, 50, 150);
+
+        // 霍夫变换得到线条
         Mat lines = new Mat();
-        //  累加器阈值参数，小于设置值不返回
-        int threshold = 30;
-        //  最低线段长度，低于设置值则不返回
-        double minLineLength = 0;
-        //  间距小于该值的线当成同一条线
-        double maxLineGap = 200;
+        //累加器阈值参数，小于设置值不返回
+        int threshold = 90;
+        //最低线段长度，低于设置值则不返回
+        double minLineLength = 100;
+        //间距小于该值的线当成同一条线
+        double maxLineGap = 10;
         // 霍夫变换，通过步长为1，角度为PI/180来搜索可能的直线
         Imgproc.HoughLinesP(canny, lines, 1, Math.PI / 180, threshold, minLineLength, maxLineGap);
-
-        // 计算每条直线的倾斜角
+        // 计算倾斜角度
         List<Integer> angelList = new ArrayList<>();
         for (int i = 0; i < lines.rows(); i++) {
             double[] line = lines.get(i, 0);
             int k = calculateAngle(line[0], line[1], line[2], line[3]);
-            //  表格类图片要过滤掉竖线，不然取得角度会有问题
-//            if (Math.abs(k) > 45) {
-//                k = 90 - k;
-//            }
             angelList.add(k);
         }
         if (angelList.isEmpty()) {
-            return 0.0;
+            return 0;
         }
-        // 整体的角度是选择众数，如果希望是平均角度可以选择平均数
+        gray.release();
+        kernel.release();
+        erode.release();
+        dilate.release();
+        canny.release();
+        lines.release();
+        // 可能还得需要考虑方差来决定选择平均数还是众数
         return most(angelList);
     }
 
@@ -160,14 +183,16 @@ public class Deskew {
      * @return 直角的倾斜度
      */
     private static int calculateAngle(double x1, double y1, double x2, double y2) {
-        if (Math.abs(x2 - x1) < 1e-4) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        if (Math.abs(dx) < 1e-4) {
             return 90;
-        } else if (Math.abs(y2 - y1) < 1e-4) {
+        } else if (Math.abs(dy) < 1e-4) {
             return 0;
         } else {
-            double k = -(y2 - y1) / (x2 - x1);
-            double res = 360 * Math.atan(k) / (2 * Math.PI);
-            return Convert.toInt(Math.round(res));
+            double radians = Math.atan2(dy, dx);
+            double degrees = Math.toDegrees(radians);
+            return Convert.toInt(Math.round(degrees));
         }
     }
 

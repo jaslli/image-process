@@ -16,7 +16,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 public class Test {
 
     public static void main(String[] args) {
-        OpencvUtil.load();
         String filePath = "C:/Users/11419/Desktop/project/image-process/src/main/resources/test/1.jpg";
         String output = "C:/Users/11419/Desktop/project/image-process/src/main/resources/test/2.jpg";
 

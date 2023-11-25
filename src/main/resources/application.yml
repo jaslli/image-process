@@ -4,3 +4,6 @@ server:
 spring:
   application:
     name: ImageProcess
+
+opencv:
+  url: lib/opencv_java470.dll
